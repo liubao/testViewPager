@@ -36,6 +36,7 @@ public class TabView extends LinearLayout {
     private int mIndicatorColor = Color.BLUE;
     private int mTabTextColor = Color.BLACK;
     private int mTabTextSize = 10;
+    private int mBottom;
 
     public TabView(Context context) {
         super(context);
@@ -120,6 +121,10 @@ public class TabView extends LinearLayout {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
+        if (mChildCount == 0) {
+            return;
+        }
+        mBottom = b;
         mPieceWidht = mWidth / mChildCount;
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
@@ -127,7 +132,7 @@ public class TabView extends LinearLayout {
             int left = l + mPieceWidht / 2 + mPieceWidht * i - childWidth / 2;
             child.layout(left, t, left + childWidth, b);
         }
-        if (mChildCount>0) {
+        if (mChildCount > 0) {
             select((TextView) getChildAt(0));
         }
     }
@@ -135,15 +140,17 @@ public class TabView extends LinearLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        TextView child = (TextView) getChildAt(mCurrentPosition);
-        int childBottom = child.getBottom();
-        Pair<Float, Float> pair = getIndicatorCoordinates();
-        canvas.drawRect(pair.first + mPaddingLeft,
-                childBottom - mIndicatorHeight,
-                pair.second + mPaddingRight,
-                childBottom,
-                mRectPaint);
-
+        if (mChildCount == 0) {
+            return;
+        }
+        if (mCurrentPosition < mChildCount) {
+            Pair<Float, Float> pair = getIndicatorCoordinates();
+            canvas.drawRect(pair.first + mPaddingLeft,
+                    mBottom - mIndicatorHeight,
+                    pair.second + mPaddingRight,
+                    mBottom,
+                    mRectPaint);
+        }
     }
 
     //获得indicator的左右位置
@@ -162,7 +169,6 @@ public class TabView extends LinearLayout {
     }
 
 
-
     public void setViewPager(ViewPager pager) {
         this.mPager = pager;
         if (pager.getAdapter() == null) {
@@ -176,11 +182,15 @@ public class TabView extends LinearLayout {
     }
 
     private void unselect(TextView view) {
-        view.setTextColor(mTabTextUnselectColor);
+        if (view != null) {
+            view.setTextColor(mTabTextUnselectColor);
+        }
     }
 
     private void select(TextView view) {
-        view.setTextColor(mTabTextSelectedColor);
+        if (view != null) {
+            view.setTextColor(mTabTextSelectedColor);
+        }
     }
 
     private void updateSelection(int position) {

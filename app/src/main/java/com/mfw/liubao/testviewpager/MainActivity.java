@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         });
         mTabView.setViewPager(mViewPager);
         mTabView.addTab("1");
-        mTabView.addTab("2sadf");
+        mTabView.addTab("dd");
         mTabView.addTab("3dd");
         mTabView.addTab("4asdfasd");
 
