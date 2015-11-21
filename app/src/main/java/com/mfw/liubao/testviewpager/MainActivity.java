@@ -6,32 +6,25 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private TabView mLinearLayout;
-    PagerAdapter mAdapter;
-    ArrayList<View> viewContainter = new ArrayList<>();
-    private int height;
-    private int width;
-    private ViewPager mViewPager;
     private String LOG_TAG = MainActivity.class.getSimpleName();
+    private TabView mTabView;
+    ArrayList<View> viewContainter = new ArrayList<>();
+    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mLinearLayout = (TabView) findViewById(R.id.linear);
-        TextView text = (TextView) findViewById(R.id.text);
+        mTabView = (TabView) findViewById(R.id.linear);
         viewContainter.add(getLayoutInflater().inflate(R.layout.tab1, null));
         viewContainter.add(getLayoutInflater().inflate(R.layout.tab2, null));
         viewContainter.add(getLayoutInflater().inflate(R.layout.tab3, null));
         viewContainter.add(getLayoutInflater().inflate(R.layout.tab4, null));
-
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
-
         mViewPager.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
@@ -55,11 +48,11 @@ public class MainActivity extends AppCompatActivity {
                 container.removeView(viewContainter.get(position));
             }
         });
-        mLinearLayout.setViewPager(mViewPager);
-        mLinearLayout.addTab("1");
-        mLinearLayout.addTab("2sadf");
-        mLinearLayout.addTab("3dd");
-        mLinearLayout.addTab("4asdfasd");
+        mTabView.setViewPager(mViewPager);
+        mTabView.addTab("1");
+        mTabView.addTab("2sadf");
+        mTabView.addTab("3dd");
+        mTabView.addTab("4asdfasd");
 
     }
 }

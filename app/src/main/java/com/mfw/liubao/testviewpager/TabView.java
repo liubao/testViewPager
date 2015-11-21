@@ -11,8 +11,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,8 +22,7 @@ public class TabView extends LinearLayout {
     private ViewPager mPager;
     private PageListener mPageListener = new PageListener();
     private int mChildCount;
-    private int mScreenHeight;
-    private int mScreenWidht;
+    private int mWidth;
     private int mPieceWidht;
     private int mCurrentPosition;
     private float mCurrentPositionOffset;
@@ -33,11 +30,12 @@ public class TabView extends LinearLayout {
     private int mPaddingRight = 0;
     private Paint mRectPaint;
     private int mTabBackgroundColor;
-    private int mTabUnselectColor = Color.BLACK;
-    private int mTabSelectColor = Color.YELLOW;
+    private int mTabTextUnselectColor = Color.BLACK;
+    private int mTabTextSelectedColor = Color.YELLOW;
     private int mIndicatorHeight = 12;
     private int mIndicatorColor = Color.BLUE;
-    private WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+    private int mTabTextColor = Color.BLACK;
+    private int mTabTextSize = 10;
 
     public TabView(Context context) {
         super(context);
@@ -67,12 +65,18 @@ public class TabView extends LinearLayout {
         this.mIndicatorHeight = mIndicatorHeight;
     }
 
+    public void setmTabTextColor(int mTabTextColor) {
+        this.mTabTextColor = mTabTextColor;
+    }
+
+    public void setmTabTextSize(int mTabTextSize) {
+        this.mTabTextSize = mTabTextSize;
+    }
+
     private void intiView() {
         //强制调用ondraw方法
         setWillNotDraw(false);
         this.setOrientation(HORIZONTAL);
-        mScreenHeight = wm.getDefaultDisplay().getHeight();
-        mScreenWidht = wm.getDefaultDisplay().getWidth();
         mRectPaint = new Paint();
         mRectPaint.setColor(mIndicatorColor);
         mRectPaint.setAntiAlias(true);
@@ -83,6 +87,8 @@ public class TabView extends LinearLayout {
     public void addTab(String tabName) {
         TextView textView = new TextView(getContext());
         textView.setText(tabName);
+        textView.setTextColor(mTabTextColor);
+        textView.setTextSize(mTabTextSize);
         textView.setGravity(Gravity.CENTER);
         addView(textView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
@@ -90,19 +96,40 @@ public class TabView extends LinearLayout {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        int width = 0;
+        int height = 0;
+        if (widthMode == MeasureSpec.EXACTLY) {
+            width = widthSize;
+        }
+        if (heightMode == MeasureSpec.EXACTLY) {
+            height = heightSize;
+        }
+        for (int i = 0; i < mChildCount; i++) {
+            getChildAt(i).measure(widthMeasureSpec / mChildCount, heightMeasureSpec);
+        }
+        mWidth = width;
+        setMeasuredDimension(width, height);
+    }
+
+
+    @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-        mPieceWidht = mScreenWidht / mChildCount;
+        mPieceWidht = mWidth / mChildCount;
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             int childWidth = child.getWidth();
-            int childHeight2 = child.getHeight() / 2;
-            int middle = (t + b) / 2;
             int left = l + mPieceWidht / 2 + mPieceWidht * i - childWidth / 2;
             child.layout(left, t, left + childWidth, b);
         }
-        //绘制一像素的线
-        getViewTreeObserver().addOnGlobalLayoutListener(firstTabGlobalLayoutListener);
+        if (mChildCount>0) {
+            select((TextView) getChildAt(0));
+        }
     }
 
     @Override
@@ -135,13 +162,6 @@ public class TabView extends LinearLayout {
     }
 
 
-    private ViewTreeObserver.OnGlobalLayoutListener firstTabGlobalLayoutListener =
-            new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-
-                }
-            };
 
     public void setViewPager(ViewPager pager) {
         this.mPager = pager;
@@ -156,11 +176,11 @@ public class TabView extends LinearLayout {
     }
 
     private void unselect(TextView view) {
-        view.setTextColor(mTabUnselectColor);
+        view.setTextColor(mTabTextUnselectColor);
     }
 
     private void select(TextView view) {
-        view.setTextColor(mTabSelectColor);
+        view.setTextColor(mTabTextSelectedColor);
     }
 
     private void updateSelection(int position) {
