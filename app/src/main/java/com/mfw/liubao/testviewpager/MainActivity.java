@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private String LOG_TAG = MainActivity.class.getSimpleName();
-    private TabView mTabView;
+    private TabLayout mTabView;
     ArrayList<View> viewContainter = new ArrayList<>();
     private ViewPager mViewPager;
 
@@ -19,12 +19,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mTabView = (TabView) findViewById(R.id.linear);
+        mTabView = (TabLayout) findViewById(R.id.linear);
         viewContainter.add(getLayoutInflater().inflate(R.layout.tab1, null));
         viewContainter.add(getLayoutInflater().inflate(R.layout.tab2, null));
         viewContainter.add(getLayoutInflater().inflate(R.layout.tab3, null));
         viewContainter.add(getLayoutInflater().inflate(R.layout.tab4, null));
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
+
+        final String[] titles ={"sssdf", "saa", "sadddddddddsf", "sassssssdwwf", "sadwwf", "sadwwf"};
         mViewPager.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
@@ -47,12 +49,13 @@ public class MainActivity extends AppCompatActivity {
             public void destroyItem(ViewGroup container, int position, Object object) {
                 container.removeView(viewContainter.get(position));
             }
+
+            @Override
+            public CharSequence getPageTitle(int position) {
+                return titles[position];
+            }
         });
         mTabView.setViewPager(mViewPager);
-        mTabView.addTab("1");
-        mTabView.addTab("dd");
-        mTabView.addTab("3dd");
-        mTabView.addTab("4asdfasd");
-
     }
+
 }
